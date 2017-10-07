@@ -1,0 +1,4 @@
+#pycairo
+CairoSVG
+pillow
+#rsvg
