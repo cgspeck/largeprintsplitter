@@ -35,7 +35,7 @@ def create_parser():
 if __name__ == '__main__':
     parser = create_parser()
     args = parser.parse_args()
-
+    print("Loading Image")
     input_image = load_image(args.image_file, args.width, args.height)
     page_geo = PageGeometry(args.page_size, portait=input_image.is_portrait())
 
@@ -43,7 +43,8 @@ if __name__ == '__main__':
         print('The image will fit on a single page')
     else:
         print('The image will not fit on a single page')
-
+    print("Calculating crop list")
     crop_list = input_image.calculate_print_chunks(page_geo.max_printable_dimensions(), args.overlap)
     print(f'This will require {len(crop_list)} pages')
+    print("Chunking image")
     input_image.chunk_and_annotate_image(crop_list)
