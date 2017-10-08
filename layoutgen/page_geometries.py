@@ -34,8 +34,8 @@ class PageGeometry(object):
 
     def max_printable_dimensions(self):
         return [
-            (min(self._page_size) if self.portait else max(self._page_size)) - self._margins,
-            (max(self._page_size) if self.portait else min(self._page_size)) - self._margins
+            (min(self._page_size) if self.portait else max(self._page_size)) - (2 * self._margins),
+            (max(self._page_size) if self.portait else min(self._page_size)) - (2 * self._margins)
         ]
 
     def generate_pdf(self, images, overlap, f_name = 'out.pdf'):
@@ -47,13 +47,16 @@ class PageGeometry(object):
             img_width = self.convert_mm_to_fractional_inch(image['width_mm'])
             img_x = self.convert_mm_to_fractional_inch(self._margins)
             img_y = _pagesize[1] - img_height - self.convert_mm_to_fractional_inch(self._margins)
+            print(image)
 
             _canvas.drawImage(
                 ImageReader(image['image']),
                 img_x,
                 img_y,
                 width=img_width,
-                height=img_height
+                height=img_height,
+                preserveAspectRatio=True,
+                anchor='sw'
             )
             _canvas.showPage()
 

@@ -55,7 +55,7 @@ class InputImage(object):
             if x1 > self.image.width:
                 x1 = self.image.width
 
-            cur_x = x1   
+            cur_x = x1
             cols.append((x0, x1))
         # calculate rows
         cur_y = 0
@@ -104,8 +104,8 @@ class InputImage(object):
                     'image': image,
                     'first_col': crop_spec[0][0] == 0,
                     'first_row': crop_spec[0][1] == 0,
-                    'height_mm': image.height * self.scale / 100,
-                    'width_mm': image.width * self.scale / 100,
+                    'height_mm': image.height / self.scale,
+                    'width_mm': image.width / self.scale,
                 }
             )
 
