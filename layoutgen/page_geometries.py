@@ -1,6 +1,8 @@
 from sys import exit
 
+from reportlab.pdfgen import canvas
 from reportlab.lib import pagesizes
+from reportlab.lib.utils import ImageReader
 
 class PageGeometry(object):
     def __init__(self, page_size, margins=10, portait=True):
@@ -26,9 +28,33 @@ class PageGeometry(object):
     def convert_fractional_inch_to_mm(value):
         return (value / 72) * 25.4
 
+    @staticmethod
+    def convert_mm_to_fractional_inch(value):
+        return (value / 25.4) * 72
 
     def max_printable_dimensions(self):
         return [
             (min(self._page_size) if self.portait else max(self._page_size)) - self._margins,
             (max(self._page_size) if self.portait else min(self._page_size)) - self._margins
         ]
+
+    def generate_pdf(self, images, overlap, f_name = 'out.pdf'):
+        _pagesize = (pagesizes.portrait(self._page_size_imperial) if self.portait else pagesizes.landscape(self._page_size_imperial))
+        _canvas = canvas.Canvas(f_name, pagesize=_pagesize)
+
+        for image in images:
+            img_height = self.convert_mm_to_fractional_inch(image['height_mm'])
+            img_width = self.convert_mm_to_fractional_inch(image['width_mm'])
+            img_x = self.convert_mm_to_fractional_inch(self._margins)
+            img_y = _pagesize[1] - img_height - self.convert_mm_to_fractional_inch(self._margins)
+
+            _canvas.drawImage(
+                ImageReader(image['image']),
+                img_x,
+                img_y,
+                width=img_width,
+                height=img_height
+            )
+            _canvas.showPage()
+
+        _canvas.save()

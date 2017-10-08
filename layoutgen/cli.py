@@ -47,4 +47,6 @@ if __name__ == '__main__':
     crop_list = input_image.calculate_print_chunks(page_geo.max_printable_dimensions(), args.overlap)
     print(f'This will require {len(crop_list)} pages')
     print("Chunking image")
-    input_image.chunk_and_annotate_image(crop_list)
+    chunked_images = input_image.chunk_and_annotate_image(crop_list)
+    print("Generating PDF")
+    page_geo.generate_pdf(chunked_images, args.overlap)
