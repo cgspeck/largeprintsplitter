@@ -41,12 +41,14 @@ class PageGeometry(object):
     def generate_pdf(self, images, overlap, f_name = 'out.pdf'):
         _pagesize = (pagesizes.portrait(self._page_size_imperial) if self.portait else pagesizes.landscape(self._page_size_imperial))
         _canvas = canvas.Canvas(f_name, pagesize=_pagesize)
+        margin = self.convert_mm_to_fractional_inch(self._margins)
+        overlap = self.convert_mm_to_fractional_inch(overlap)
 
         for image in images:
             img_height = self.convert_mm_to_fractional_inch(image['height_mm'])
             img_width = self.convert_mm_to_fractional_inch(image['width_mm'])
-            img_x = self.convert_mm_to_fractional_inch(self._margins)
-            img_y = _pagesize[1] - img_height - self.convert_mm_to_fractional_inch(self._margins)
+            img_x = margin
+            img_y = _pagesize[1] - img_height - margin
 
             _canvas.drawImage(
                 ImageReader(image['image']),
@@ -58,6 +60,27 @@ class PageGeometry(object):
                 anchor='sw',
                 mask=[0, 0, 0, 0, 0, 0]
             )
+
+            _canvas.setStrokeColorRGB(1, 0, 0)
+
+            if not image['first_col']:
+                # draw a line, overlap in, from the leftmost margin
+                _canvas.line(
+                    margin + overlap,
+                    0,
+                    margin + overlap,
+                    _pagesize[1]
+                )
+
+            if not image['first_row']:
+                # draw a line, overlap + magin from the top of the page
+                _canvas.line(
+                    0,
+                    _pagesize[1] - margin - overlap,
+                    _pagesize[0],
+                    _pagesize[1] - margin - overlap
+                )
+
             _canvas.showPage()
 
         _canvas.save()
