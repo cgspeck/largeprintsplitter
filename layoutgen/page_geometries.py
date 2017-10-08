@@ -47,7 +47,6 @@ class PageGeometry(object):
             img_width = self.convert_mm_to_fractional_inch(image['width_mm'])
             img_x = self.convert_mm_to_fractional_inch(self._margins)
             img_y = _pagesize[1] - img_height - self.convert_mm_to_fractional_inch(self._margins)
-            print(image)
 
             _canvas.drawImage(
                 ImageReader(image['image']),
@@ -56,7 +55,8 @@ class PageGeometry(object):
                 width=img_width,
                 height=img_height,
                 preserveAspectRatio=True,
-                anchor='sw'
+                anchor='sw',
+                mask=[0, 0, 0, 0, 0, 0]
             )
             _canvas.showPage()
 
