@@ -83,13 +83,31 @@ class InputImage(object):
     def chunk_and_annotate_image(self, crop_list):
         ''' Returns and array of cropped images '''
         images = []
+        # # [
+        #     {
+        #         'first_row'
+        #         'first_col'
+        #         'image'
+        #         'width' (mm)
+        #         'hieght' (mm)
+        #     }
+        # ]
         for crop_spec in crop_list:
-            images.append(self.image.crop((
+            image = self.image.crop((
                 crop_spec[0][0],
                 crop_spec[0][1],
                 crop_spec[1][0],
                 crop_spec[1][1],
-            )))
+            ))
+            images.append(
+                {
+                    'image': image,
+                    'first_col': crop_spec[0][0] == 0,
+                    'first_row': crop_spec[0][1] == 0,
+                    'height_mm': image.height * self.scale / 100,
+                    'width_mm': image.width * self.scale / 100,
+                }
+            )
 
         return images
 
