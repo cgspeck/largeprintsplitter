@@ -1,7 +1,7 @@
 import argparse
 
-from input_handler import load_image
-from page_geometries import PageGeometry
+from lps.input_handler import load_image
+from lps.page_geometries import PageGeometry
 
 def create_parser():
     parser = argparse.ArgumentParser()
@@ -30,13 +30,19 @@ def create_parser():
         type=int,
         help='Print overlap in mm'
     )
+    parser.add_argument(
+        '--svg_start_scale',
+        default=3,
+        type=int,
+        help='When using SVG, this is the largest scale factor to attempt to generate an image'
+    )
     return parser
 
-if __name__ == '__main__':
+def run_cli():
     parser = create_parser()
     args = parser.parse_args()
     print("Loading Image")
-    input_image = load_image(args.image_file, args.width, args.height)
+    input_image = load_image(args.image_file, args.width, args.height, args.svg_start_scale)
     page_geo = PageGeometry(args.page_size, portait=input_image.is_portrait())
 
     if input_image.fits_on_a_page(page_geo.max_printable_dimensions()):
@@ -50,3 +56,6 @@ if __name__ == '__main__':
     chunked_images = input_image.chunk_and_annotate_image(crop_list)
     print("Generating PDF")
     page_geo.generate_pdf(chunked_images, args.overlap)
+
+if __name__ == '__main__':
+    run_cli()

@@ -1,9 +1,10 @@
 from io import BytesIO
 
 import cairosvg
+from cairocffi import CairoError
 from PIL import Image
 
-VECTOR_SCALE = 12
+MAX_PIXELS = 89478485
 
 class InputImage(object):
     def __init__(self, image, scale):
@@ -33,13 +34,11 @@ class InputImage(object):
 
         # [ PAGE, PAGE, PAGE ]
         # [ [(x0, y0), (x1, y1)], [(x0, y0), (x1, y0)], [(x0, y0), (x1, y0)]]
-
         printable_x = printable_dimensions[0] # mm
         printable_x_scaled = printable_x * self.scale
         printable_y = printable_dimensions[1] # mm
         printable_y_scaled = printable_y * self.scale
         overlap_scaled = overlap * self.scale
-        # printable_y = printable_dimensions[1]
 
         # calculate cols
         cur_x = 0
@@ -108,19 +107,42 @@ class InputImage(object):
                     'width_mm': image.width / self.scale,
                 }
             )
-
         return images
 
 
-def handle_svg(image_file, desired_width, desired_height):
-    svg_bytes = cairosvg.svg2png(file_obj=image_file, scale=VECTOR_SCALE)
-    svg_stream = BytesIO(svg_bytes)
-    im = Image.open(svg_stream)
-    return InputImage(im, VECTOR_SCALE)
+def handle_svg(image_file, desired_width, desired_height, start_scale=3):
+    im = None
+    # try and find a large scale factor for the vector image
+    for i in range(start_scale, 0, -1):
+        try:
+            print(f'Trying to generate raster image of svg at {i}x scale')
+            svg_bytes = cairosvg.svg2png(file_obj=image_file, scale=i)
+        except CairoError as e:
+            pass
+        else:
+            svg_stream = BytesIO(svg_bytes)
+            im = Image.open(svg_stream)
 
-def load_image(image_file, desired_width, desired_height):
+            if im.width * im.height > MAX_PIXELS:
+                print(f'Image width or height is greater then {MAX_PIXELS} pixels, trying a lower scale')
+                continue
+
+            break
+
+    if im is None:
+        raise 'Unable to find a scaling factor for the SVG!'
+
+    # calculate the ACTUAL scale because scale above is not honoured
+    if desired_width:
+        scale = im.width / desired_width
+    else:
+        scale = im.height / desired_height
+
+    return InputImage(im, scale)
+
+def load_image(image_file, desired_width, desired_height, start_scale):
     if image_file.name.split('.')[-1] == 'svg':
-        return handle_svg(image_file, desired_width, desired_height)
+        return handle_svg(image_file, desired_width, desired_height, start_scale)
 
     im = Image.open(image_file)
 
@@ -128,5 +150,4 @@ def load_image(image_file, desired_width, desired_height):
         scale = im.width / desired_width
     else:
         scale = im.height / desired_height
-    
     return InputImage(image_file, scale)
