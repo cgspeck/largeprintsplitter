@@ -1,6 +1,7 @@
 #! /bin/env python3.6
-import pandoc
+import pypandoc
 import sys
+import io
 import os
 
 
@@ -32,11 +33,11 @@ if rc != 0:
     sys.exit(1)
 
 # create a rst
-doc = pandoc.Document()
-doc.markdown = open('README.md', 'rb').read()
-f = open('README.rst', 'wb')
-f.write(doc.rst)
+doc = pypandoc.convert_file('README.md', 'rst')
+f = open('README.rst', 'wt')
+f.write(doc)
 f.close()
+
 # test upload
 rc = os.system("python setup.py sdist upload -r pypitest")
 

@@ -1,3 +1,3 @@
 ipdb
-pandoc
+pypandoc
 -r requirements-test.txt
