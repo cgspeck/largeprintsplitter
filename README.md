@@ -12,7 +12,8 @@ PDF generation is done by ReportLab.
 ```
 $ lps -h
 usage: lps [-h] (--width WIDTH | --height HEIGHT) [--page_size PAGE_SIZE]
-           [--overlap OVERLAP] [--svg_start_scale SVG_START_SCALE]
+           [--overlap OVERLAP] [--margins MARGINS] [--outfile OUTFILE]
+           [--svg_start_scale SVG_START_SCALE]
            image_file
 
 positional arguments:
@@ -25,6 +26,8 @@ optional arguments:
   --page_size PAGE_SIZE
                         Page size, e.g. a3, a4
   --overlap OVERLAP     Print overlap in mm
+  --margins MARGINS     Print margins in mm
+  --outfile OUTFILE     Filename to save pdf to
   --svg_start_scale SVG_START_SCALE
                         When using SVG, this is the largest scale factor to
                         attempt to generate an image
