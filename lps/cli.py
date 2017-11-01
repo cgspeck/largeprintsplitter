@@ -37,6 +37,11 @@ def create_parser():
         help='Print margins in mm'
     )
     parser.add_argument(
+        '--outfile',
+        default='out.pdf',
+        help='Filename to save pdf to'
+    )
+    parser.add_argument(
         '--svg_start_scale',
         default=3,
         type=int,
@@ -61,7 +66,7 @@ def run_cli():
     print("Chunking image")
     chunked_images = input_image.chunk_and_annotate_image(crop_list)
     print("Generating PDF")
-    page_geo.generate_pdf(chunked_images, args.overlap)
+    page_geo.generate_pdf(chunked_images, args.overlap, f_name=args.outfile)
 
 if __name__ == '__main__':
     run_cli()
