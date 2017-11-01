@@ -31,6 +31,12 @@ def create_parser():
         help='Print overlap in mm'
     )
     parser.add_argument(
+        '--margins',
+        default=10,
+        type=int,
+        help='Print margins in mm'
+    )
+    parser.add_argument(
         '--svg_start_scale',
         default=3,
         type=int,
@@ -43,7 +49,7 @@ def run_cli():
     args = parser.parse_args()
     print("Loading Image")
     input_image = load_image(args.image_file, args.width, args.height, args.svg_start_scale)
-    page_geo = PageGeometry(args.page_size, portait=input_image.is_portrait())
+    page_geo = PageGeometry(args.page_size, margins=args.margins, portait=input_image.is_portrait())
 
     if input_image.fits_on_a_page(page_geo.max_printable_dimensions()):
         print('The image will fit on a single page')

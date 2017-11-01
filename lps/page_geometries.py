@@ -13,7 +13,7 @@ class PageGeometry(object):
         except AttributeError as e:
             print(f'Unknown page size "{page_size}"!')
             exit(1)
-        
+
         self._page_size_imperial = page_size_imperial
         self._page_size = (
             self.convert_fractional_inch_to_mm(page_size_imperial[0]),
